@@ -24,9 +24,8 @@ def consultarCep(widget):
 	
 	# Pegando valor do campo
 	valueCep = inputCep.get_text()
-		
 	
-	if valueCep.isnumeric() == False:
+	if valueCep.isnumeric() == False or len(valueCep) < 8:
 		inputCep.set_text('Inválido')
 		
 		# Mostando resultado da pesquisa
@@ -38,28 +37,32 @@ def consultarCep(widget):
 		resulIbge.set_text('?')
 	else:	
 		# Fazendo requisição Api ViaCep
-		req = requests.get('https://viacep.com.br/ws/{}/json'.format(valueCep))
-		res = req.json()
+		try:
+			req = requests.get('https://viacep.com.br/ws/{}/json'.format(valueCep))
+			res = req.json()
+			
+			if 'erro' in res:
+				inputCep.set_text('Inválido')
+
+				# Mostando resultado da pesquisa
+				resulLogradouro.set_text('?')
+				resulComplemento.set_text('?')
+				resulBairro.set_text('?')
+				resulLocalidade.set_text('?')
+				resulUf.set_text('?')
+				resulIbge.set_text('?')
+			else:
+				# Mostando resultado da pesquisa
+				resulLogradouro.set_text(res['logradouro'])
+				resulComplemento.set_text(res['complemento'])
+				resulBairro.set_text(res['bairro'])
+				resulLocalidade.set_text(res['localidade'])
+				resulUf.set_text(res['uf'])
+				resulIbge.set_text(res['ibge'])
+		except:
+			print('Sem conexão com a internet !')
+			exit()
 		
-		if 'erro' in res:
-			inputCep.set_text('Inválido')
-
-			# Mostando resultado da pesquisa
-			resulLogradouro.set_text('?')
-			resulComplemento.set_text('?')
-			resulBairro.set_text('?')
-			resulLocalidade.set_text('?')
-			resulUf.set_text('?')
-			resulIbge.set_text('?')
-		else:
-			# Mostando resultado da pesquisa
-			resulLogradouro.set_text(res['logradouro'])
-			resulComplemento.set_text(res['complemento'])
-			resulBairro.set_text(res['bairro'])
-			resulLocalidade.set_text(res['localidade'])
-			resulUf.set_text(res['uf'])
-			resulIbge.set_text(res['ibge'])
-
 def limparCampo(widget):
 	# Selecionando campo
 	inputCep = builder.get_object('inputCep')
